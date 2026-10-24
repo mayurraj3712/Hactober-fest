@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athena | Privacy-First Study & Research Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            900: '#1e1b4b',
+                            cyan: '#06b6d4',
+                            neon: '#a855f7',
+                            darkbg: '#090d16',
+                            cardbg: 'rgba(15, 23, 42, 0.75)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070a12;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-glow {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.2);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+        .pulse-ring {
+            box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
+            animation: pulse-ring 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes pulse-ring {
+            to {
+                box-shadow: 0 0 0 25px rgba(168, 85, 247, 0);
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Header & Executive Status Hub -->
+    <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-50 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid fa-brain text-cyan-400 text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                            ATHENA <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">v2.4-LOCAL</span>
+                        </h1>
+                    </div>
+                    <p class="text-xs text-slate-400">Privacy-First Offline Voice & Research Assistant</p>
+                </div>
+            </div>
+
+            <!-- Offline & Security Indicator Badge -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs px-3 py-1.5 rounded-full font-medium shadow-inner">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span>Fully Offline Mode Active</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-emerald-400 font-mono text-[11px]"><i class="fa-solid fa-microchip mr-1"></i>GPU Accel Ready</span>
+                </div>
+                
+                <!-- Quick Settings Toggle -->
+                <button onclick="toggleGlobalAudio()" id="mute-btn" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-volume-high text-cyan-400" id="mute-icon"></i>
+                    <span class="hidden sm:inline">Audio Output</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- System Resource Monitor Cards -->
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 mt-6 w-full">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            
+            <!-- Ollama LLM Card -->
+            <div class="glass-panel p-3.5 rounded-xl flex flex-col justify-between hover:border-indigo-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-robot text-indigo-400"></i> LLM Engine
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Connected
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <div class="text-sm font-semibold text-slate-100 font-mono">Ollama / Llama 3 8B</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">Quant: Q4_K_M (4.9 GB)</div>
+                </div>
+            </div>
+
+            <!-- Whisper STT Card -->
+            <div class="glass-panel p-3.5 rounded-xl flex flex-col justify-between hover:border-indigo-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-microphone-lines text-cyan-400"></i> Speech-to-Text
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        Whisper.cpp
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <div class="text-sm font-semibold text-slate-100 font-mono">Whisper Medium.en</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">Latency: ~180ms (Local)</div>
+                </div>
+            </div>
+
+            <!-- Piper TTS Card -->
+            <div class="glass-panel p-3.5 rounded-xl flex flex-col justify-between hover:border-indigo-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-waveform text-purple-400"></i> Text-to-Speech
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                        Piper TTS
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <div class="text-sm font-semibold text-slate-100 font-mono">en_US-amy-medium</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">Speed: 1.1x | Neural</div>
+                </div>
+            </div>
+
+            <!-- ChromaDB Card -->
+            <div class="glass-panel p-3.5 rounded-xl flex flex-col justify-between hover:border-indigo-500/40 transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-amber-400"></i> Vector Store
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        ChromaDB
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <div class="text-sm font-semibold text-slate-100 font-mono" id="chunk-counter">1,420 Chunks</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">Nomic-Embed-Text v1.5</div>
+                </div>
+            </div>
+
+            <!-- Supabase Cloud Backup Card -->
+            <div class="glass-panel p-3.5 rounded-xl flex flex-col justify-between hover:border-indigo-500/40 transition col-span-2 md:col-span-1">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                        <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Cloud Sync
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Active
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <div class="text-sm font-semibold text-slate-100 font-mono truncate">hbzhhzwjvn...</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">Sync Logs & History</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 mt-6 mb-12 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Voice Activation Hub & Document Ingestion (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+
+            <!-- Voice Interaction Hub Card -->
+            <div class="glass-panel-glow rounded-2xl p-6 flex flex-col items-center justify-between relative overflow-hidden">
+                <div class="w-full flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-purple-500 animate-ping"></span>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-purple-300">Voice Interaction Hub</h2>
+                    </div>
+                    <span id="voice-status-text" class="text-xs font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-800">
+                        Ready for voice input
+                    </span>
+                </div>
+
+                <!-- Canvas Visualizer -->
+                <div class="relative w-full h-32 my-2 flex items-center justify-center">
+                    <canvas id="audioVisualizer" class="w-full h-full rounded-xl bg-slate-950/60 border border-slate-800/80"></canvas>
+                    
+                    <!-- Overlay Push-to-Talk Button -->
+                    <button id="voice-btn" onclick="toggleVoiceActivation()" class="absolute inset-auto w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-500 p-1 flex items-center justify-center shadow-xl shadow-purple-600/30 hover:scale-105 active:scale-95 transition-all duration-300 group cursor-pointer z-10">
+                        <div class="w-full h-full bg-slate-950 rounded-full flex flex-col items-center justify-center group-hover:bg-slate-900 transition">
+                            <i id="voice-mic-icon" class="fa-solid fa-microphone text-2xl text-purple-400 group-hover:text-cyan-300 transition"></i>
+                            <span class="text-[9px] font-mono text-slate-400 uppercase mt-1 tracking-wider" id="mic-label font-bold">SPEAK</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Speech-to-Text Live Transcript Box -->
+                <div class="w-full mt-4">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="text-xs font-mono text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-quote-left text-indigo-400"></i> Whisper.cpp Live STT Transcript:
+                        </label>
+                        <button onclick="clearTranscript()" class="text-[10px] text-slate-500 hover:text-slate-300 underline font-mono">Clear</button>
+                    </div>
+                    <div id="stt-transcript" class="w-full h-20 bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 overflow-y-auto leading-relaxed">
+                        <span class="text-slate-600 italic">Click the mic button or speak to test local speech recognition... Try saying "Explain Photosynthesis" or "What is Quantum Mechanics?"</span>
+                    </div>
+                </div>
+
+                <!-- Audio Output Wave & Voice Controls -->
+                <div class="w-full mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="speakCurrentResponse()" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 text-xs font-medium flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-play text-cyan-400"></i> Read Aloud
+                        </button>
+                        <button onclick="stopSpeech()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs transition">
+                            <i class="fa-solid fa-stop"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+                        <span>Speed:</span>
+                        <select id="speech-rate" class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded px-1.5 py-1">
+                            <option value="0.9">0.9x</option>
+                            <option value="1.0" selected>1.0x</option>
+                            <option value="1.1">1.1x</option>
+                            <option value="1.25">1.25x</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Ingestion & Local Indexer Card -->
+            <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Document Ingestion & RAG
+                    </h2>
+                    <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Local Vectorizer</span>
+                </div>
+
+                <!-- Drag & Drop Area -->
+                <div id="drop-zone" onclick="simulateFileUpload()" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 bg-slate-950/40 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer transition group">
+                    <div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-indigo-400 group-hover:scale-110 transition mb-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                    </div>
+                    <p class="text-xs font-medium text-slate-300 text-center">Click or Drag & Drop Study Documents</p>
+                    <p class="text-[10px] text-slate-500 font-mono mt-1">Supports PDF, Markdown (.md), TXT (Offline Parsed)</p>
+                </div>
+
+                <!-- Indexing Progress Indicator -->
+                <div id="indexing-progress-container" class="hidden flex-col gap-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span id="indexing-filename" class="text-indigo-300 truncate max-w-[200px]">document_notes.pdf</span>
+                        <span id="indexing-percent" class="text-cyan-400">0%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                        <div id="indexing-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 w-0 transition-all duration-300"></div>
+                    </div>
+                    <span id="indexing-status" class="text-[10px] text-slate-400 font-mono">Chunking text & computing Nomic Embed embeddings...</span>
+                </div>
+
+                <!-- Pre-Loaded Sample Documents Quick Select -->
+                <div>
+                    <label class="text-[11px] font-mono text-slate-400 mb-2 block">Quick-Load Sample Documents:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="loadSampleDoc('photosynthesis')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2">
+                            <i class="fa-solid fa-leaf text-emerald-400 text-xs"></i>
+                            <div class="truncate">
+                                <p class="text-xs font-medium text-slate-200">Photosynthesis</p>
+                                <p class="text-[9px] text-slate-500 font-mono">350 chunks</p>
+                            </div>
+                        </button>
+                        <button onclick="loadSampleDoc('quantum')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2">
+                            <i class="fa-solid fa-atom text-purple-400 text-xs"></i>
+                            <div class="truncate">
+                                <p class="text-xs font-medium text-slate-200">Quantum Physics</p>
+                                <p class="text-[9px] text-slate-500 font-mono">420 chunks</p>
+                            </div>
+                        </button>
+                        <button onclick="loadSampleDoc('ml_basics')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2">
+                            <i class="fa-solid fa-network-wired text-cyan-400 text-xs"></i>
+                            <div class="truncate">
+                                <p class="text-xs font-medium text-slate-200">Machine Learning</p>
+                                <p class="text-[9px] text-slate-500 font-mono">510 chunks</p>
+                            </div>
+                        </button>
+                        <button onclick="loadSampleDoc('dsa')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2">
+                            <i class="fa-solid fa-code text-amber-400 text-xs"></i>
+                            <div class="truncate">
+                                <p class="text-xs font-medium text-slate-200">Data Structures</p>
+                                <p class="text-[9px] text-slate-500 font-mono">140 chunks</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Interactive Chat, RAG Console, & Context Inspector (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+
+            <!-- Main Workspace Card with Mode Switcher -->
+            <div class="glass-panel rounded-2xl p-5 flex flex-col h-[580px]">
+                
+                <!-- Tab Navigation & Mode Switcher -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
+                        <button onclick="switchTab('chat')" id="tab-chat" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
+                            <i class="fa-solid fa-comments"></i> Voice Chat
+                        </button>
+                        <button onclick="switchTab('rag')" id="tab-rag" class="px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-magnifying-glass font-mono"></i> RAG Inspector
+                        </button>
+                        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-graduation-cap"></i> Flashcards & Quiz
+                        </button>
+                    </div>
+
+                    <!-- Voice System Prompt Persona Tag -->
+                    <span class="text-[10px] font-mono text-purple-300 bg-purple-950/60 border border-purple-500/30 px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <i class="fa-solid fa-bolt text-purple-400"></i> Persona: Athena Concise TTS
+                    </span>
+                </div>
+
+                <!-- VIEW 1: Chat Console -->
+                <div id="view-chat" class="flex-grow flex flex-col justify-between pt-4 overflow-hidden">
+                    <!-- Message Log Container -->
+                    <div id="chat-messages" class="flex-grow overflow-y-auto pr-2 flex flex-col gap-4">
+                        
+                        <!-- Initial System Welcome Message -->
+                        <div class="flex gap-3 max-w-[88%]">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-brain text-indigo-400 text-xs"></i>
+                            </div>
+                            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-none p-3.5 text-xs text-slate-200 leading-relaxed shadow-sm">
+                                <p class="font-semibold text-indigo-300 mb-1 flex items-center gap-1.5">
+                                    Athena <span class="text-[10px] font-mono text-slate-500 font-normal">0.01ms local</span>
+                                </p>
+                                <p>Hello! I am Athena, your offline study and research assistant. I run 100% locally on your machine. Ask me any question, click the mic button to speak, or upload study notes to query your local ChromaDB vector store!</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Chat Input Controls -->
+                    <div class="pt-3 mt-2 border-t border-slate-800/80 flex items-center gap-2">
+                        <div class="relative flex-grow">
+                            <input type="text" id="user-input" onkeydown="handleKeyPress(event)" placeholder="Ask Athena a research question or type 'quiz me'..." class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition font-sans">
+                            <button onclick="toggleVoiceActivation()" class="absolute right-2 top-2 text-slate-400 hover:text-cyan-400 transition p-1">
+                                <i class="fa-solid fa-microphone text-sm"></i>
+                            </button>
+                        </div>
+                        <button onclick="sendUserMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/20">
+                            <span>Send</span>
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: RAG Context Inspector -->
+                <div id="view-rag" class="hidden flex-grow flex-col pt-4 overflow-y-auto pr-1 gap-4">
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5">
+                        <h3 class="text-xs font-bold text-slate-200 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-layer-group text-cyan-400"></i> Vector Similarity Search Inspector
+                        </h3>
+                        <p class="text-[11px] text-slate-400">Shows live ChromaDB embedding matches retrieved for your last query. Ranked by Cosine Distance similarity score using <code class="text-indigo-300 font-mono">nomic-embed-text</code>.</p>
+                    </div>
+
+                    <!-- Context Chunks List -->
+                    <div id="rag-chunks-container" class="flex flex-col gap-3">
+                        
+                        <!-- Chunk Item 1 -->
+                        <div class="bg-slate-900/60 border border-indigo-500/30 rounded-xl p-3.5 flex flex-col gap-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-indigo-400 font-semibold"><i class="fa-solid fa-file-text mr-1"></i>biology_notes.pdf (Chunk #42)</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px]">Similarity: 0.942</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-mono bg-slate-950 p-2.5 rounded border border-slate-800/80 leading-relaxed">
+                                "Photosynthesis occurs primarily in chloroplasts using sunlight, water, and CO2. The light-dependent reactions take place in the thylakoid membranes, generating ATP and NADPH."
+                            </p>
+                        </div>
+
+                        <!-- Chunk Item 2 -->
+                        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-purple-400 font-semibold"><i class="fa-solid fa-file-text mr-1"></i>quantum_mechanics.md (Chunk #108)</span>
+                                <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded text-[10px]">Similarity: 0.887</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-mono bg-slate-950 p-2.5 rounded border border-slate-800/80 leading-relaxed">
+                                "Quantum entanglement is a phenomenon where physical particles remain connected such that actions performed on one affect the other instantly, regardless of distance."
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- VIEW 3: Flashcard & Quiz Generator -->
+                <div id="view-quiz" class="hidden flex-grow flex-col pt-4 overflow-y-auto pr-1 gap-4">
+                    <div class="flex justify-between items-center bg-slate-950/80 border border-slate-800 rounded-xl p-3.5">
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-cards-blank text-purple-400"></i> AI Flashcards & Active Recall
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Generated directly from your local ChromaDB indexed study documents.</p>
+                        </div>
+                        <button onclick="generateNewQuiz()" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium transition shadow-lg shadow-purple-600/20">
+                            <i class="fa-solid fa-rotate mr-1"></i> Generate Flashcard
+                        </button>
+                    </div>
+
+                    <!-- Interactive Flashcard Widget -->
+                    <div class="flex-grow flex items-center justify-center py-4">
+                        <div id="flashcard" onclick="flipFlashcard()" class="w-full max-w-md h-52 bg-slate-900 border border-purple-500/40 rounded-2xl p-6 flex flex-col justify-between items-center text-center cursor-pointer hover:border-purple-400 transition-all shadow-xl relative group">
+                            <div class="w-full flex justify-between items-center text-[10px] font-mono text-slate-500">
+                                <span>Topic: Cellular Biology</span>
+                                <span id="card-side-label" class="text-purple-400">QUESTION (Click to flip)</span>
+                            </div>
+                            
+                            <div class="my-auto">
+                                <p id="card-text" class="text-sm font-semibold text-slate-100 leading-snug">
+                                    "Where do the light-dependent reactions of photosynthesis take place inside a plant cell?"
+                                </p>
+                            </div>
+
+                            <div class="text-[10px] text-slate-500 flex items-center gap-1">
+                                <i class="fa-solid fa-hand-pointer text-purple-400"></i> Click card to view answer
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Supabase Cloud Sync Manager & Audit Table -->
+            <div class="glass-panel rounded-2xl p-5 flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Supabase Cloud Sync Logs
+                        </h2>
+                        <p class="text-[11px] text-slate-400 font-mono">Project ID: hbzhhzwjvnlsdfhdhuve (study_sessions table)</p>
+                    </div>
+                    <button onclick="refreshSupabaseLogs()" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-300 transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Sync Now
+                    </button>
+                </div>
+
+                <!-- Table Logs -->
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-900/80 text-slate-400 font-mono text-[10px] uppercase">
+                                <th class="py-2 px-3">Session ID / Timestamp</th>
+                                <th class="py-2 px-3">User Query</th>
+                                <th class="py-2 px-3">Athena Voice Output</th>
+                                <th class="py-2 px-3">Sync Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supabase-log-rows" class="divide-y divide-slate-800/60 font-mono text-[11px] text-slate-300">
+                            <tr>
+                                <td class="py-2 px-3 text-slate-500">usr_89f2 • 12:28 PM</td>
+                                <td class="py-2 px-3 text-indigo-300">"Where does photosynthesis happen?"</td>
+                                <td class="py-2 px-3 text-slate-400 truncate max-w-[180px]">"Photosynthesis occurs in chloroplasts..."</td>
+                                <td class="py-2 px-3"><span class="text-emerald-400"><i class="fa-solid fa-check mr-1"></i>Synced</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-slate-500">usr_89f2 • 12:24 PM</td>
+                                <td class="py-2 px-3 text-indigo-300">"Explain quantum entanglement"</td>
+                                <td class="py-2 px-3 text-slate-400 truncate max-w-[180px]">"Quantum entanglement connects particles..."</td>
+                                <td class="py-2 px-3"><span class="text-emerald-400"><i class="fa-solid fa-check mr-1"></i>Synced</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-4 px-8 text-center text-xs text-slate-500 font-mono">
+        <p>Athena AI Assistant • Local Inference Pipeline (Ollama + Whisper.cpp + Piper TTS + ChromaDB) • 100% Privacy Preserved</p>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // --- Global State ---
+        let isListening = false;
+        let isAudioMuted = false;
+        let recognition = null;
+        let speechSynth = window.speechSynthesis;
+        let currentTab = 'chat';
+        let currentFlashcardSide = 'question';
+        let currentResponseText = "Photosynthesis occurs primarily in chloroplasts using sunlight, water, and CO2. The light-dependent reactions take place in the thylakoid membranes, generating ATP and NADPH.";
+
+        // --- Audio Visualizer Setup (Canvas) ---
+        const canvas = document.getElementById('audioVisualizer');
+        const ctx = canvas.getContext('2d');
+        let visualizerAnimId = null;
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawVisualizer() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const width = canvas.width;
+            const height = canvas.height;
+            const numBars = 32;
+            const barWidth = (width / numBars) - 3;
+
+            for (let i = 0; i < numBars; i++) {
+                // Generate dynamic height based on listening state
+                let barHeight = isListening 
+                    ? Math.sin(Date.now() * 0.008 + i * 0.3) * (height * 0.35) + (height * 0.4)
+                    : Math.sin(Date.now() * 0.002 + i * 0.2) * (height * 0.08) + (height * 0.12);
+
+                const x = i * (barWidth + 3) + 2;
+                const y = (height - barHeight) / 2;
+
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+                if (isListening) {
+                    gradient.addColorStop(0, '#a855f7');
+                    gradient.addColorStop(0.5, '#6366f1');
+                    gradient.addColorStop(1, '#06b6d4');
+                } else {
+                    gradient.addColorStop(0, '#334155');
+                    gradient.addColorStop(1, '#1e293b');
+                }
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barHeight, 4);
+                ctx.fill();
+            }
+
+            visualizerAnimId = requestAnimationFrame(drawVisualizer);
+        }
+        drawVisualizer();
+
+        // --- Speech Recognition (STT - Whisper Simulation) ---
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('voice-status-text').innerText = "Whisper.cpp Listening...";
+                document.getElementById('voice-status-text').className = "text-xs font-mono text-purple-300 bg-purple-950/80 px-2.5 py-1 rounded-full border border-purple-500/40 animate-pulse";
+                document.getElementById('voice-mic-icon').className = "fa-solid fa-microphone text-2xl text-cyan-300";
+            };
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('stt-transcript').innerText = transcript;
+                document.getElementById('user-input').value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.log("Speech recognition error:", event.error);
+                stopVoiceActivation();
+            };
+
+            recognition.onend = () => {
+                stopVoiceActivation();
+                const userQuery = document.getElementById('user-input').value;
+                if (userQuery.trim().length > 0) {
+                    sendUserMessage();
+                }
+            };
+        }
+
+        function toggleVoiceActivation() {
+            if (isListening) {
+                if (recognition) recognition.stop();
+                stopVoiceActivation();
+            } else {
+                if (recognition) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        simulateVoiceDictation();
+                    }
+                } else {
+                    simulateVoiceDictation();
+                }
+            }
+        }
+
+        function stopVoiceActivation() {
+            isListening = false;
+            document.getElementById('voice-status-text').innerText = "Ready for voice input";
+            document.getElementById('voice-status-text').className = "text-xs font-mono text-slate-400 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-800";
+            document.getElementById('voice-mic-icon').className = "fa-solid fa-microphone text-2xl text-purple-400";
+        }
+
+        function simulateVoiceDictation() {
+            isListening = true;
+            document.getElementById('voice-status-text').innerText = "Whisper.cpp Simulating STT...";
+            document.getElementById('stt-transcript').innerText = "Listening...";
+            
+            setTimeout(() => {
+                const sampleQueries = [
+                    "Where does photosynthesis take place?",
+                    "Explain quantum entanglement simply.",
+                    "What is a binary search tree?",
+                    "How do neural networks learn?"
+                ];
+                const query = sampleQueries[Math.floor(Math.random() * sampleQueries.length)];
+                document.getElementById('stt-transcript').innerText = query;
+                document.getElementById('user-input').value = query;
+                stopVoiceActivation();
+                sendUserMessage();
+            }, 2500);
+        }
+
+        function clearTranscript() {
+            document.getElementById('stt-transcript').innerText = "Transcript cleared. Click the mic to begin.";
+            document.getElementById('user-input').value = "";
+        }
+
+        // --- Text-to-Speech (Piper Simulation using SpeechSynthesis) ---
+        function speakCurrentResponse() {
+            if (isAudioMuted || !speechSynth) return;
+
+            speechSynth.cancel(); // Stop ongoing speech
+            const utterance = new SpeechSynthesisUtterance(currentResponseText);
+            const rate = parseFloat(document.getElementById('speech-rate').value || 1.0);
+            utterance.rate = rate;
+            
+            // Try selecting a natural sounding English voice
+            const voices = speechSynth.getVoices();
+            const preferredVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            speechSynth.speak(utterance);
+        }
+
+        function stopSpeech() {
+            if (speechSynth) speechSynth.cancel();
+        }
+
+        function toggleGlobalAudio() {
+            isAudioMuted = !isAudioMuted;
+            const muteIcon = document.getElementById('mute-icon');
+            const muteBtn = document.getElementById('mute-btn');
+            
+            if (isAudioMuted) {
+                stopSpeech();
+                muteIcon.className = "fa-solid fa-volume-xmark text-rose-400";
+                muteBtn.classList.add('border-rose-500/40');
+            } else {
+                muteIcon.className = "fa-solid fa-volume-high text-cyan-400";
+                muteBtn.classList.remove('border-rose-500/40');
+            }
+        }
+
+        // --- Chat & Query Response Logic ---
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendUserMessage();
+            }
+        }
+
+        function sendUserMessage() {
+            const inputEl = document.getElementById('user-input');
+            const query = inputEl.value.trim();
+            if (!query) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+
+            // 1. Append User Message
+            const userMsgHtml = `
+                <div class="flex gap-3 max-w-[88%] ml-auto flex-row-reverse">
+                    <div class="w-8 h-8 rounded-lg bg-purple-600/30 border border-purple-500/40 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-user text-purple-300 text-xs"></i>
+                    </div>
+                    <div class="bg-indigo-950/80 border border-indigo-500/30 rounded-2xl rounded-tr-none p-3.5 text-xs text-slate-100 leading-relaxed shadow-sm">
+                        <p class="font-semibold text-purple-300 mb-1 flex items-center gap-1.5 justify-end">
+                            You <span class="text-[10px] font-mono text-slate-400 font-normal">Voice/Text Query</span>
+                        </p>
+                        <p>${query}</p>
+                    </div>
+                </div>
+            `;
+            chatMessages.innerHTML += userMsgHtml;
+            inputEl.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // 2. Generate Simulated Response based on Knowledge Base
+            setTimeout(() => {
+                let response = "";
+                let retrievedChunk = "";
+
+                if (query.toLowerCase().includes("photosynthesis")) {
+                    response = "Photosynthesis occurs in plant chloroplasts using sunlight, carbon dioxide, and water. The light-dependent phase produces ATP and NADPH in the thylakoids, while the Calvin Cycle synthesizes glucose.";
+                    retrievedChunk = "Photosynthesis occurs in chloroplasts using sunlight, water, and CO2. Light reactions in thylakoids produce ATP and NADPH.";
+                } else if (query.toLowerCase().includes("quantum")) {
+                    response = "Quantum entanglement is a phenomenon where physical particles remain intimately connected such that measuring one instantly influences the state of another, even across vast interstellar distances.";
+                    retrievedChunk = "Quantum entanglement: physical state correlation between distant particles. Non-locality validated via Bell tests.";
+                } else if (query.toLowerCase().includes("search") || query.toLowerCase().includes("tree") || query.toLowerCase().includes("data")) {
+                    response = "A Binary Search Tree is a node-based structure where the left subtree contains values smaller than the parent node, and the right subtree contains larger values, offering O(log n) average lookup time.";
+                    retrievedChunk = "Binary Search Tree properties: left < parent < right. Average lookup time complexity O(log n).";
+                } else {
+                    response = `Based on your local indexed notes in ChromaDB, I found relevant context regarding "${query}". I have summarized the key points concisely for fast voice review.`;
+                    retrievedChunk = `Context extracted for query "${query}" from local PDF database. Distance score: 0.912.`;
+                }
+
+                currentResponseText = response;
+
+                // 3. Append Athena Assistant Response
+                const athenaMsgHtml = `
+                    <div class="flex gap-3 max-w-[88%]">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-brain text-indigo-400 text-xs"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-none p-3.5 text-xs text-slate-200 leading-relaxed shadow-sm">
+                            <p class="font-semibold text-indigo-300 mb-1 flex items-center gap-1.5">
+                                Athena <span class="text-[10px] font-mono text-emerald-400 font-normal"><i class="fa-solid fa-check mr-0.5"></i>Grounded in ChromaDB</span>
+                            </p>
+                            <p>${response}</p>
+                        </div>
+                    </div>
+                `;
+                chatMessages.innerHTML += athenaMsgHtml;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // 4. Update RAG Inspector Tab with latest chunk
+                updateRAGInspector(query, retrievedChunk);
+
+                // 5. Speak response automatically if unmuted
+                speakCurrentResponse();
+
+                // 6. Log to Supabase Audit Table
+                logToSupabaseTable(query, response);
+
+            }, 800);
+        }
+
+        // --- RAG Inspector Update ---
+        function updateRAGInspector(query, chunkText) {
+            const container = document.getElementById('rag-chunks-container');
+            const chunkHtml = `
+                <div class="bg-slate-900/60 border border-cyan-500/30 rounded-xl p-3.5 flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-xs font-mono">
+                        <span class="text-cyan-400 font-semibold"><i class="fa-solid fa-database mr-1"></i>ChromaDB Match for "${query}"</span>
+                        <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded text-[10px]">Similarity: 0.938</span>
+                    </div>
+                    <p class="text-xs text-slate-300 font-mono bg-slate-950 p-2.5 rounded border border-slate-800/80 leading-relaxed">
+                        "${chunkText}"
+                    </p>
+                </div>
+            `;
+            container.innerHTML = chunkHtml + container.innerHTML;
+        }
+
+        // --- Document Ingestion Simulator ---
+        function simulateFileUpload() {
+            const container = document.getElementById('indexing-progress-container');
+            const progressBar = document.getElementById('indexing-bar');
+            const percentText = document.getElementById('indexing-percent');
+            const statusText = document.getElementById('indexing-status');
+
+            container.classList.remove('hidden');
+            container.classList.add('flex');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 15;
+                if (progress > 100) progress = 100;
+
+                progressBar.style.width = progress + '%';
+                percentText.innerText = progress + '%';
+
+                if (progress < 40) {
+                    statusText.innerText = "Parsing document pages & extracting plain text...";
+                } else if (progress < 80) {
+                    statusText.innerText = "Splitting into 500-token chunks with 50-token overlap...";
+                } else {
+                    statusText.innerText = "Computing embeddings via nomic-embed-text & saving to ChromaDB...";
+                }
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        statusText.innerText = "✅ Successfully indexed 42 new chunks into local ChromaDB!";
+                        // Update chunk counter
+                        document.getElementById('chunk-counter').innerText = "1,462 Chunks";
+                    }, 500);
+                }
+            }, 250);
+        }
+
+        function loadSampleDoc(type) {
+            simulateFileUpload();
+        }
+
+        // --- Supabase Log Table Sync ---
+        function logToSupabaseTable(query, response) {
+            const tableBody = document.getElementById('supabase-log-rows');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const rowHtml = `
+                <tr>
+                    <td class="py-2 px-3 text-slate-500">usr_89f2 • ${timeStr}</td>
+                    <td class="py-2 px-3 text-indigo-300 font-sans">"${query}"</td>
+                    <td class="py-2 px-3 text-slate-400 truncate max-w-[180px] font-sans">"${response}"</td>
+                    <td class="py-2 px-3"><span class="text-emerald-400"><i class="fa-solid fa-check mr-1"></i>Synced</span></td>
+                </tr>
+            `;
+            tableBody.innerHTML = rowHtml + tableBody.innerHTML;
+        }
+
+        function refreshSupabaseLogs() {
+            // Simulated flash refresh
+            const tableBody = document.getElementById('supabase-log-rows');
+            tableBody.style.opacity = '0.3';
+            setTimeout(() => {
+                tableBody.style.opacity = '1';
+            }, 300);
+        }
+
+        // --- Tab Switching Logic ---
+        function switchTab(tab) {
+            currentTab = tab;
+            const views = ['chat', 'rag', 'quiz'];
+            views.forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`view-${v}`).classList.remove('flex');
+                
+                const tabBtn = document.getElementById(`tab-${v}`);
+                tabBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center gap-1.5";
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`view-${tab}`).classList.add('flex');
+            
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
+        }
+
+        // --- Flashcard Logic ---
+        const flashcardSet = [
+            { q: "Where do the light-dependent reactions of photosynthesis take place inside a plant cell?", a: "In the thylakoid membranes of chloroplasts." },
+            { q: "What is the primary function of ChromaDB in our local RAG pipeline?", a: "Storing and retrieving document text chunks using vector similarity embeddings." },
+            { q: "What key advantage does Whisper.cpp offer over standard Python Whisper?", a: "Drastically faster C/C++ execution with lower memory footprint for real-time CPU/GPU transcription." },
+            { q: "What is quantum superposition?", a: "The ability of a quantum system to be in multiple states simultaneously until it is measured." }
+        ];
+        let flashcardIndex = 0;
+
+        function flipFlashcard() {
+            const textEl = document.getElementById('card-text');
+            const sideEl = document.getElementById('card-side-label');
+            const card = document.getElementById('flashcard');
+
+            if (currentFlashcardSide === 'question') {
+                currentFlashcardSide = 'answer';
+                textEl.innerText = flashcardSet[flashcardIndex].a;
+                textEl.className = "text-sm font-semibold text-emerald-300 leading-snug";
+                sideEl.innerText = "ANSWER (Click to flip back)";
+                sideEl.className = "text-emerald-400 font-mono";
+            } else {
+                currentFlashcardSide = 'question';
+                textEl.innerText = flashcardSet[flashcardIndex].q;
+                textEl.className = "text-sm font-semibold text-slate-100 leading-snug";
+                sideEl.innerText = "QUESTION (Click to flip)";
+                sideEl.className = "text-purple-400 font-mono";
+            }
+        }
+
+        function generateNewQuiz() {
+            flashcardIndex = (flashcardIndex + 1) % flashcardSet.length;
+            currentFlashcardSide = 'question';
+            const textEl = document.getElementById('card-text');
+            const sideEl = document.getElementById('card-side-label');
+            
+            textEl.innerText = flashcardSet[flashcardIndex].q;
+            textEl.className = "text-sm font-semibold text-slate-100 leading-snug";
+            sideEl.innerText = "QUESTION (Click to flip)";
+            sideEl.className = "text-purple-400 font-mono";
+        }
+
+    </script>
+</body>
+</html>
